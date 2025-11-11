@@ -23,7 +23,6 @@ public class BajajApplication implements CommandLineRunner {
         RestTemplate restTemplate = new RestTemplate();
 
         try {
-            // Step 1: Generate webhook and access token
             String generateUrl = "https://bfhldevapigw.healthrx.co.in/hiring/generateWebhook/JAVA";
 
             Map<String, String> body = Map.of(
@@ -46,7 +45,7 @@ public class BajajApplication implements CommandLineRunner {
             System.out.println("Webhook URL: " + webhookUrl);
             System.out.println("Access Token: " + accessToken);
 
-            // Step 2: Your final SQL query
+            
             String sqlQuery = "SELECT E1.EMP_ID, E1.FIRST_NAME, E1.LAST_NAME, D.DEPARTMENT_NAME, "
                     + "COUNT(E2.EMP_ID) AS YOUNGER_EMPLOYEES_COUNT "
                     + "FROM EMPLOYEE E1 "
@@ -56,16 +55,13 @@ public class BajajApplication implements CommandLineRunner {
                     + "GROUP BY E1.EMP_ID, E1.FIRST_NAME, E1.LAST_NAME, D.DEPARTMENT_NAME "
                     + "ORDER BY E1.EMP_ID DESC;";
 
-            // Step 3: Prepare headers for the second POST request
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", accessToken);
 
-            // Step 4: Create request body
             Map<String, String> queryBody = Map.of("finalQuery", sqlQuery);
             HttpEntity<Map<String, String>> request = new HttpEntity<>(queryBody, headers);
 
-            // Step 5: Submit the SQL query to the webhook
             ResponseEntity<String> result = restTemplate.postForEntity(webhookUrl, request, String.class);
 
             System.out.println("Submission Response: " + result.getBody());
